@@ -1,48 +1,57 @@
-'use client'
-import React, { useState } from 'react';
-import { fileExplorerData } from '@/lib/data/fileExplorer';
+"use client";
+import React, { useState } from "react";
+import { FileNode } from "@/lib/types/FileNode";
+import { AddFolderIcon } from "@/lib/icons/AddFolderIcon";
+import { DeleteIcon } from "@/lib/icons/DeleteIcon";
 
-export const FileExplorer = () => {
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+export const FileExplorer = ({
+  FileExplorerList = [],
+}: {
+  FileExplorerList: FileNode[];
+}) => {
+  const [expandedNodes, setExpandedNodes] = useState<{
+    [val: string]: boolean;
+  }>({});
 
   const toggleNode = (id: string) => {
-    setExpandedNodes(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+    setExpandedNodes((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
-    <div>
-      {fileExplorerData.map((node) => (
-        <div key={node.id} className='flex flex-col'>
-          <div className='flex items-center gap-2'>
-            {node.children ? (
-              <button onClick={() => toggleNode(node.id)} className='w-4 h-4 flex items-center justify-center'>
-                {expandedNodes.has(node.id) ? '▼' : '▶'}
-              </button>
+    <>
+      {FileExplorerList.map((node) => {
+        return (
+          <div key={node.id} className="my-1 ml-5 ">
+            {node.isFolder ? (
+              <div className="flex items-center gap-2">
+                <button
+                  className="flex items-center gap-1 bg-background/95"
+                  onClick={() => toggleNode(node.id)}
+                >
+                  {expandedNodes[node.id] ? (
+                    <span>&#8722;</span>
+                  ) : (
+                    <span>&gt;</span>
+                  )}
+                  <div>{node.name}</div>
+                </button>
+                <button className="hover:scale-110">
+                  <AddFolderIcon height={16} width={16} />
+                </button>
+                <button className="hover:scale-110">
+                  <DeleteIcon height={16} width={16} />
+                </button>
+              </div>
             ) : (
-              <div className='w-4 h-4 bg-gray-300 rounded-full'></div>
+              <span>{node.name}</span>
             )}
-            <div className='text-sm font-medium'>{node.name}</div>
+
+            {expandedNodes[node.id] && node?.children && (
+              <FileExplorer FileExplorerList={node?.children} />
+            )}
           </div>
-          {node.children && expandedNodes.has(node.id) && (
-            <div className='pl-4'>
-              {node.children.map((child) => (
-                <div key={child.id} className='flex items-center gap-2'>
-                  <div className='w-4 h-4 bg-gray-300 rounded-full'></div>
-                  <div className='text-sm font-medium'>{child.name}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+        );
+      })}
+    </>
   );
 };
