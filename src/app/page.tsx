@@ -35,12 +35,27 @@ export default function Home() {
     };
     setFilesFolder((prev) => updateFilesData(prev));
   };
+
+  const handleDeleteFileFolder = (id: string) => {
+    const updateFilesData = (files: FileNode[]): FileNode[] => {
+      return files
+        .filter((node) => node.id !== id)
+        .map((node) => {
+          if (node?.children) {
+            return { ...node, children: updateFilesData(node.children) };
+          }
+          return node;
+        });
+    };
+    setFilesFolder((prev) => updateFilesData(prev));
+  };
   return (
     <main>
       <Header />
       <FileExplorer
         fileExplorerList={filesFolder}
         handleAddFolder={handleAddFolder}
+        handleDeleteFileFolder={handleDeleteFileFolder}
       />
     </main>
   );

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -25,14 +24,17 @@ export const AddFolderModal = ({
   ) => void;
   openNode: (id: string) => void;
 }) => {
-  const [formData, setFormData] = useState({ name: "", isFolder: false });
+  const initialFormData = { name: "", isFolder: false };
+  const [formData, setFormData] = useState(initialFormData);
   const [open, setOpen] = useState(false);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleAddFolder(folder.id, { name: formData.name, isFolder: false });
+    handleAddFolder(folder.id, {
+      ...formData,
+    });
     openNode(folder.id);
     setOpen(false);
-    // onclose();
+    setFormData(initialFormData);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,15 +48,17 @@ export const AddFolderModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add new item to {folder.name}</DialogTitle>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-            <Label htmlFor="name">Name</Label>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2 py-3">
+            <Label htmlFor="name">File/Folder Name</Label>
             <Input
+              required
               id="name"
               value={formData.name}
               onChange={handleNameChange}
             />
             <div className="flex items-center gap-2">
-              <input
+              <Input
+                className="size-auto"
                 type="checkbox"
                 id="isFolder"
                 checked={formData.isFolder}
